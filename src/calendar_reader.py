@@ -101,7 +101,86 @@ def listar_proximos_eventos(quantidade=10):
         print(f"  {inicio}  |  {titulo}")
 
 
+def inspecionar_evento(evento):
+    """
+    Imprime todos os campos de um evento para entendermos a estrutura da API.
+    Usada só na fase de exploração — como um ShowMessage de debug no Delphi.
+    """
+    print("\n" + "=" * 60)
+    for campo, valor in evento.items():
+        print(f"  {campo}: {valor}")
+    print("=" * 60)
+
+
+def inspecionar_agenda(quantidade=5):
+    """
+    Lista os próximos N eventos imprimindo todos os campos de cada um.
+    Padrão: 5 eventos (suficiente para entender a estrutura).
+    """
+    creds = autenticar()
+    service = build("calendar", "v3", credentials=creds)
+    agora = datetime.now(timezone.utc).isoformat()
+
+    resultado = (
+        service.events()
+        .list(
+            calendarId="primary",
+            timeMin=agora,
+            maxResults=quantidade,
+            singleEvents=True,
+            orderBy="startTime",
+        )
+        .execute()
+    )
+
+    eventos = resultado.get("items", [])
+
+    if not eventos:
+        print("Nenhum evento encontrado.")
+        return
+
+    print(f"\nInspecionando {len(eventos)} evento(s)...\n")
+    for evento in eventos:
+        inspecionar_evento(evento)
+
+
+def descobrir_color_ids():
+    """
+    Busca eventos específicos pelo nome para descobrir seus colorId.
+    Usado uma única vez para mapear cor → colorId do Google Calendar.
+    """
+    creds = autenticar()
+    service = build("calendar", "v3", credentials=creds)
+
+    # Busca eventos de março/2026 até hoje para encontrar os eventos conhecidos
+    resultado = (
+        service.events()
+        .list(
+            calendarId="primary",
+            timeMin="2026-03-01T00:00:00-03:00",
+            timeMax="2026-06-04T23:59:59-03:00",
+            maxResults=200,
+            singleEvents=True,
+            orderBy="startTime",
+        )
+        .execute()
+    )
+
+    eventos = resultado.get("items", [])
+
+    # Nomes que queremos encontrar para mapear as cores
+    nomes_alvo = ["Sil", "Karol", "Pra Ana", "Silvana Laerte"]
+
+    print("\nMapeamento de cores:\n")
+    for evento in eventos:
+        nome = evento.get("summary", "")
+        if nome in nomes_alvo:
+            color_id = evento.get("colorId", "sem cor (padrão)")
+            inicio = evento["start"].get("dateTime", evento["start"].get("date"))
+            print(f"  {inicio}  |  {nome}  |  colorId: {color_id}")
+
+
 # Ponto de entrada do script
 # Equivale ao "begin ... end." do programa principal no Delphi
 if __name__ == "__main__":
-    listar_proximos_eventos()
+    descobrir_color_ids()

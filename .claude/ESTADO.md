@@ -6,20 +6,24 @@
 ## Módulos concluídos
 - Módulo 0: Ambiente e organização (estrutura de pastas, arquivos de contexto, Git)
 - Módulo 1: Conexão com Google Calendar API ✓
+- Módulo 2: Exploração e entendimento dos dados da agenda ✓
 
 ## Módulo em andamento
 - Nenhum (pausa entre sessões)
 
-## Próximo passo — Módulo 2: Ler e entender os dados da agenda
-- Evoluir o `src/calendar_reader.py` para exibir mais campos dos eventos
-  (descrição, participantes, cor do evento, recorrência)
-- Explorar como o Google Calendar representa eventos recorrentes
-  (campo `recurrence` com regras RRULE)
-- Identificar manualmente na agenda da esposa quais clientes têm padrão quinzenal
-- Preparar base para o módulo de detecção automática de padrões
+## Próximo passo — Módulo 3: Detecção de padrão de frequência por cliente
+- Buscar os últimos 3 meses de eventos do Google Calendar
+- Filtrar apenas atendimentos do salão (colorId em: 5, 6, 10, 11)
+- Agrupar eventos por nome de cliente
+- Calcular intervalo médio entre visitas de cada cliente
+- Classificar o padrão detectado:
+  - ~15 dias → quinzenal
+  - ~20 dias com mesmo dia da semana → "20 dias com dia fixo"
+  - ~30 dias → mensal
+- Exibir o resultado no terminal: "Camila: quinzenal | Ju do Cledi: 20 dias (segunda)"
 
-## Para retomar amanhã, basta Ativar o ambiente virtual (sempre que abrir o terminal)
-- .venv\Scripts\Activate.ps1
+## Para retomar, basta ativar o ambiente virtual no terminal
+- `.venv\Scripts\Activate.ps1`
 
 ## Decisões pendentes
 - Qual provedor WhatsApp usar: Z-API ou Evolution API
@@ -31,15 +35,13 @@
 - Estrutura de pastas do repositório
 - Arquivos de contexto (.claude/)
 - `requirements.txt` — bibliotecas do projeto
-- `src/calendar_reader.py` — conecta na Google Calendar API e lista eventos
+- `src/calendar_reader.py` — conecta na Google Calendar API, lista e inspeciona eventos
 - `credentials.json` — chave OAuth do Google Cloud (não versionada)
 - `token.json` — token de sessão gerado após 1º login (não versionado)
 - `.gitignore` — protege arquivos sensíveis
 
-## Ambiente configurado
-- Python + .venv instalados
-- Bibliotecas: google-auth, google-auth-oauthlib, google-api-python-client, python-dotenv
-- Projeto Google Cloud criado: `agendamento-estetico`
-- Google Calendar API ativada
-- Credenciais OAuth2 criadas e funcionando
-- Usuária de teste adicionada: taifossa@gmail.com
+## Conhecimento adquirido
+- Agendamentos NÃO são recorrentes no Google Calendar — criados manualmente um a um
+- Padrão deve ser detectado analisando histórico, não campo `recurrence`
+- Filtro de atendimentos: colorId 5 (Banana), 6 (Tanjerina), 10 (Manjericão), 11 (Tomate)
+- Mesmo cliente pode ter serviços diferentes em visitas distintas
